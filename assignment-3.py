@@ -6,19 +6,14 @@ import math
 
 W_Width, W_Height = 500, 800
 
-global_E_SE = False
-global_cx = 0
+
 global_y_position_reciever = -240
 
 dNE = 0
 dE = 0
-gx1 = 0
-gx2= 0
-gy1 = 0
-gy2 = 0
-# convertedZone = 0
-# actualZone = 0
-# randY = 0
+
+
+
 randx = 0
 pause = False
 score = 0
@@ -32,60 +27,20 @@ reciever_center_y=0
 
 
 
-dcolor= [random.uniform(0.0, 1.0), random.uniform(0.0, 1.0), random.uniform(0.0, 1.0)]
+
 speed = 0.1
 game_over = False
-ball_center = 200
-random_x =random.randint(-235, 235)
+
+
 rx=[]
-ry=[]
+
 bubbles=[]
 projectiles=[]
 missed=0
+projectile_missed=0
 
 
 
-    
-# def convertToPreviousZone(x, y):
-
-#     global convertedZone, actualZone
-
-#     if (actualZone == 1):
-#         return [y, x]
-#     elif (actualZone == 2):
-#         return [-y , x]
-#     elif (actualZone == 3):
-#         return [-x, y]
-#     elif (actualZone == 4):
-#         return [-x , -y]
-#     elif (actualZone == 5):
-#         return [-y, -x]
-#     elif(actualZone == 6):
-#         return [y, -x]
-#     elif (actualZone == 7):
-#         return [x, -y]
-#     else:
-#         return [x, y]
-# def drawPoints(gx1, gy1, gx2, gy2, color):
-#     red , green, blue = color
-#     global dinit, dNE, dE
-#     # print(f"drawPoints->{gx1} {gy1} {gx2} {gy2}")
-#     while(gx1 <= gx2):
-#         if(dinit <= 0 ):
-#             dinit += dE
-#             gx1+=1
-#         elif(dinit> 0 ):
-#             dinit += dNE
-#             gx1 += 1
-#             gy1 += 1
-
-#         glPointSize(2)
-#         glBegin(GL_POINTS)
-#         glColor3f(red,green,blue)
-#         # print(f"x: {gx1}, y: {gy1}")
-#         x, y = convertToPreviousZone(gx1, gy1)
-#         glVertex2f(x, y)
-#         glEnd()
 
 def convertZone(x1, y1, x2, y2, zone):
     # all are converted for zero zone
@@ -222,8 +177,7 @@ def change_points(x,y):
 
 def drawLine():
     global drawx1,drawx2,drawy1,drawy2,red1,green1,blue1
-    # print("got points")
-    # drawing first line
+    
     [drawnewx1, drawnewy1] = change_points(drawx1, drawy1)
     # print(drawnewx1,drawnewy1,"first point draw")
     glPointSize(3)
@@ -240,10 +194,7 @@ def drawLine():
 
     dNE=2*dy-2*dx
     dE=2*dy
-    # print(drawx1,drawy1,drawx2,drawy2,"after shifting")
-    # print(dx,dy,dinit,dNE,dE)
-
-    # finding req pixewls
+   
     while(drawx1<=drawx2):
         if(dinit)>0:
             drawy1+=1
@@ -263,15 +214,6 @@ def drawLine():
         glColor3f(red1, green1, blue1)
         glVertex2f(drawnewx1, drawnewy1)
         glEnd()
-    # print(zone,"zone")
-
-
-
-    # glPointSize(5)
-    # glBegin(GL_POINTS)
-    # glColor3f(0, 1.0, 0.0)
-    # glVertex2f(x1,y1)
-    # glEnd()
 
 
 
@@ -299,9 +241,9 @@ def backButton():
        findZone(-240, 230, -250, 240, 0.0, 1.0, 1.0)
 
 def shooting_collisions():
-    global bubble_score
+    global bubble_score,projectiles,bubbles
     for i in projectiles:
-        project_x=i["x"]
+        project_x=i["x"]-10
         project_y=i["y"]
         radius_projectile=i['radius']
         for j in bubbles:
@@ -314,14 +256,16 @@ def shooting_collisions():
                 bubble_score+=1
                 bubbles.remove(j)
                 projectiles.remove(i)
-                print(bubble_score)
+                print("Score:",bubble_score)
+            
 
 
                  
             
 
 def checkingRecieverCollisions():
-    global reciever_radius,reciever_center,reciever_center_y,game_over
+    #checing falling bbuble clash with reciever
+    global reciever_radius,reciever_center,reciever_center_y,game_over,bubble_score,pause
     for j in bubbles:
             bubble_x=j["x"]
             bubble_y=j["y"]
@@ -331,11 +275,14 @@ def checkingRecieverCollisions():
             # print(bubble_x,bubble_y)
             if (distance<=radius_sum):
                 print("Game Over!")
+                print("Score:",bubble_score)
                 game_over=True
+                pause=True
 
 
 def checkingBubbleScreen():
-    global missed,game_over
+    #checking buble went out of screen
+    global missed,game_over,bubble_score,pause
     for j in bubbles:
             bubble_x=j["x"]
             bubble_y=j["y"]
@@ -344,12 +291,29 @@ def checkingBubbleScreen():
                 
                 bubbles.remove(j)
                 missed+=1
-                print(missed)
+                # print(missed)
                 if(missed ==3 ):
                     game_over = True
-                    print("game over!")
+                    pause=True
+                    print("Game over!")
+                    print("Score:",bubble_score)
                 
 
+
+
+def projectileOutOfScreen():
+    global projectiles,projectile_missed,game_over,bubble_score,pause
+    for i in projectiles:
+        if (i['y']>250):
+             projectiles.remove(i)
+             projectile_missed+=1
+            #  print(projectile_missed)
+             if (projectile_missed==3):
+                 game_over=True
+                 pause=True
+
+                 print("Game Over")
+                 print("Score:",bubble_score)
     
 def animate():
     global t, bubbles,game_over,pause
@@ -361,7 +325,7 @@ def animate():
                     t = 0
                     
                     rand_x = random.randint(-235, 235)
-                    rad=random.randint(15,20)
+                    rad=random.randint(10,20)
                     bubbles.append({'x': rand_x, 'y': 200,"rad":rad})
                 
                 
@@ -374,11 +338,12 @@ def animate():
 
                 for projectile in projectiles:
                     
-                    projectile['y'] += 10 
+                    projectile['y'] += 1 
 
                 shooting_collisions()
                 checkingRecieverCollisions()
                 checkingBubbleScreen()
+                projectileOutOfScreen()
                 
 
                     
@@ -392,90 +357,101 @@ def drawProjectiles():
         x = projectile['x']
         y = projectile['y']
         radius = projectile['radius']
-        drawcircle2(x, y, radius, [0.0, 1.0, 0.0])
+        drawcircle2(x, y, radius, 0.0, 1.0, 0.0)
 
-def diamond():
+def draw_bubbles():
     global bubbles
     for bubble in bubbles:
         x = bubble['x']
         y = bubble['y']
         rad=bubble['rad']
-        drawcircle2(x, y, rad, [1.0, 1.0, 0.0])
+        drawcircle2(x, y, rad, 1.0, 1.0, 0.0)
 
 
-def plot_circle_points(x_center, y_center, x, y, color):
-    red, green, blue = color
+def plot_circle_points(x_axis_center, y_axis_center, x, y, red,green,blue):
+    
     global move,project_pos,reciever_center,reciever_center_y
     project_pos=x+move
     reciever_center=x+move
-    reciever_center_y=y_center+y
+    reciever_center_y=y_axis_center+y
     
     glPointSize(2)
     glBegin(GL_POINTS)
     glColor3f(red, green, blue)
     
-   
-    glVertex2f(+x+move, y_center + y) #zone - 1
-    glVertex2f(-x+move, y_center + y) #zone - 2
-    glVertex2f(+x+move, y_center - y) #zone - 6
-    glVertex2f(-x+move, y_center - y) #zone - 5
-    glVertex2f(+y+move, y_center + x) #zone - 0
-    glVertex2f(-y+move, y_center + x) #zone - 3
-    glVertex2f(+y+move, y_center -  x) #zone - 7
-    glVertex2f(-y+move, y_center - x) #zone - 4
+    #zone - 1
+    glVertex2f(+x+move, y_axis_center + y)
+    #zone - 2 
+    glVertex2f(-x+move, y_axis_center + y) 
+    #zone - 6
+    glVertex2f(+x+move, y_axis_center - y) 
+    #zone - 5
+    glVertex2f(-x+move, y_axis_center - y) 
+    #zone - 0
+    glVertex2f(+y+move, y_axis_center + x) 
+    #zone - 3
+    glVertex2f(-y+move, y_axis_center + x) 
+    #zone - 7
+    glVertex2f(+y+move, y_axis_center -  x) 
+    #zone - 4
+    glVertex2f(-y+move, y_axis_center - x) 
     glEnd()
 
-def plot_circle_points2(x_center, y_center, x, y, color):
-    red, green, blue = color
+def plot_circle_points2(x_axis_center, y_axis_center, x, y, red,green,blue):
+    
     glPointSize(2)
     glBegin(GL_POINTS)
     glColor3f(red, green, blue)
-    glVertex2f(x_center + x, y_center + y)
-    glVertex2f(x_center - x, y_center + y)
-    glVertex2f(x_center + x, y_center - y)
-    glVertex2f(x_center - x, y_center - y)
-    glVertex2f(x_center + y, y_center + x)
-    glVertex2f(x_center - y, y_center + x)
-    glVertex2f(x_center + y, y_center - x)
-    glVertex2f(x_center - y, y_center - x)
+    glVertex2f(x_axis_center + x, y_axis_center + y)
+    glVertex2f(x_axis_center - x, y_axis_center + y)
+    glVertex2f(x_axis_center + x, y_axis_center - y)
+    glVertex2f(x_axis_center - x, y_axis_center - y)
+    glVertex2f(x_axis_center + y, y_axis_center + x)
+    glVertex2f(x_axis_center - y, y_axis_center + x)
+    glVertex2f(x_axis_center + y, y_axis_center - x)
+    glVertex2f(x_axis_center - y, y_axis_center - x)
     glEnd()
 
-def drawcircle(x_center, y_center, radius, color, x):
+def drawcircle(x_axis_center, y_axis_center, radius, red,green,blue, x):
     global reciever_radius
     reciever_radius=radius
 
     y = radius
     d = 1 - radius
-    plot_circle_points(x_center, y_center, x, y, color)
+    plot_circle_points(x_axis_center, y_axis_center, x, y, red,green,blue)
    
     while x < y:
         if d < 0:
-            d += 2 * x + 3
+            d += 2*x + 3
+            x += 1
         else:
-            d += 2 * (x - y) + 5
+            d += 2*x - 2*y+ 5
             y -= 1
-        x += 1
+            x += 1
+       
 
-        plot_circle_points(x_center, y_center, x, y, color)
+        plot_circle_points(x_axis_center, y_axis_center, x, y, red,green,blue)
 
 
-def drawcircle2(x_center, y_center, radius, color):
+def drawcircle2(x_axis_center, y_axis_center, radius, red,green,blue):
     x = 0
     y = radius
     d = 1 - radius
-    plot_circle_points2(x_center, y_center, x, y, color)
+    plot_circle_points2(x_axis_center, y_axis_center, x, y, red,green,blue)
     while x < y:
         if d < 0:
             d += 2 * x + 3
+            x += 1
         else:
-            d += 2 * (x - y) + 5
+            d += 2*x - 2*y + 5
             y -= 1
-        x += 1
-        plot_circle_points2(x_center, y_center, x, y, color)
+            x += 1
+        
+        plot_circle_points2(x_axis_center, y_axis_center, x, y, red,green,blue)
 
-def reciever():
+def shooter():
 
-    drawcircle(0, global_y_position_reciever, 15, [1.0, 0.0, 0.0], 0)
+    drawcircle(0, global_y_position_reciever, 15, 1.0, 0.0, 0.0, 0)
 
 
 def cross():
@@ -498,9 +474,9 @@ def display():
     glMatrixMode(GL_MODELVIEW)
 
     cross()
-    # pause_start()
+   
     backButton()
-    reciever()
+    shooter()
 
 
 
@@ -517,7 +493,7 @@ def display():
     if(game_over):
         pass
     else:
-        diamond()
+        draw_bubbles()
         drawProjectiles()
  
     glutSwapBuffers()
@@ -535,39 +511,15 @@ def convert_coordinate(x,y):
     a = x - (W_Width/2)
     b = (W_Height/2) - y
     return a,b
-# def mouseListener(button, state, x, y):
-#     global ballx, bally, pause, score, game_over, randY, speed
 
 
-#     if button == GLUT_LEFT_BUTTON:
 
-#         if (state == GLUT_DOWN):
-#             c_X, c_y = convert_coordinate(x, y)
-#             ballx, bally = c_X, c_y
-#             print("ballx=>", ballx)
-#             print("bally=>", bally)
-           
-#             if not game_over:
-#                 if((ballx >= -25 and bally >= 340) and (ballx <= 25 and bally <= 400)):
-#                     pause = not(pause)
-#             if ((ballx >=180 and bally >= 340) and (ballx <= 250 and bally <= 400)):
-#                 glutLeaveMainLoop()
-#                 print("GoodBye! score:", score)
-
-#             if(( -221>= ballx >=-250 and 400>= bally >=360 )):
-
-#                 game_over = False
-#                 randY = 0
-#                 score = 0
-#                 speed = 0
-#                 print("starting over...")
-#     glutPostRedisplay()
 
 
 
 
 def mouseListener(button, state, x, y):
-        global pause,game_over,points,diamond_peak,catch_red,catch_green,catch_blue,speed
+        global pause,game_over,speed,bubble_score,projectiles,bubbles
 
 
         if button == GLUT_LEFT_BUTTON:
@@ -581,19 +533,20 @@ def mouseListener(button, state, x, y):
                     if (game_over == False):
                         pause=not pause
                 elif ((click_x < 250.0 and click_x > 208.0) and (click_y < 400.0 and click_y > 360.0)):
-                    print("GoodBye! Score",bubble_score)
+                    print("GoodBye! Score:",bubble_score)
                     speed=1
                     glutLeaveMainLoop()
                 elif ((click_x > -250.0 and click_x < -220.0) and (click_y < 400.0 and click_y > 360.0)):
                     print("Starting Over!")
-                    points=0
-                    diamond_peak = 0 #diamond starting from top
-                    game_over=False #so that tings doesnt reamin pause
-                    # making catcher white color as restarting
-                    catch_red = 1.0
-                    catch_green = 1.0
-                    catch_blue = 1.0
-                    speed=1
+                    bubble_score=0
+                    projectiles=[]
+                    bubbles=[]
+                   
+                    game_over=False
+                     #so that tings doesnt reamin pause
+                    pause=False
+                   
+                    speed=0.1
 
 
 
@@ -619,7 +572,7 @@ def keyboardListener(key, x, y):
         elif key == b' ':
             
             y = global_y_position_reciever + 15
-            projectiles.append({'x': project_pos, 'y': y, 'radius': 5})
+            projectiles.append({'x': project_pos-10, 'y': y, 'radius': 5})
                 
             
         glutPostRedisplay()
@@ -630,9 +583,9 @@ glutInit()
 glutInitWindowSize(W_Width, W_Height)
 glutInitWindowPosition(0, 0)
 glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB)
-wind = glutCreateWindow(b"p")
+wind = glutCreateWindow(b"assignment-3")
 init()
-# randomX()
+
 glutIdleFunc(animate)
 glutDisplayFunc(display)
 glutKeyboardFunc(keyboardListener)
