@@ -306,25 +306,11 @@ def display():
        glMatrixMode(GL_MODELVIEW)
        # //initialize the matrix
        glLoadIdentity()
-       # //now give three info
-       # //1. where is the camera (viewer)?
-       # //2. where is the camera looking?
-       # //3. Which direction is the camera's UP direction?
+      
        gluLookAt(0, 0, 200, 0, 0, 0, 0, 1, 0)
        glMatrixMode(GL_MODELVIEW)
        #
-       # glPointSize(5)
-       # glBegin(GL_POINTS)
-       # glColor3f(1.0, 1.0, 0.0)
-       # glVertex2f(250,400)
-       # glEnd()
-       #
-       #
-       # glPointSize(5)
-       # glBegin(GL_POINTS)
-       # glColor3f(1.0, 1.0, 0.0)
-       # glVertex2f(250,-400)
-       # glEnd()
+      
 
        # cross
        findZone(220, 230, 250, 250, 1.0, 0.0, 0.0)
